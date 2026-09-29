@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIMP Berbasis Web - Manajemen Persediaan</title>
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside>
+        <div>
+            <div class="sidebar-brand">
+                <i class="fa-solid fa-boxes-stacked"></i> Velox Project
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-link active" onclick="switchPage('dashboard', this)">
+                    <i class="fa-solid fa-chart-pie"></i> Dashboard Stok
+                </li>
+                <li class="menu-link" onclick="switchPage('materials', this)">
+                    <i class="fa-solid fa-warehouse"></i> Data Bahan Baku
+                </li>
+                <li class="menu-link" onclick="switchPage('procurement', this)">
+                    <i class="fa-solid fa-cart-shopping"></i> Pengadaan & PO
+                </li>
+                <li class="menu-link" onclick="switchPage('settings', this)">
+                    <i class="fa-solid fa-gear"></i> Pengaturan Sistem
+                </li>
+            </ul>
+        </div>
+        <div class="sidebar-footer">
+            <span>Technology Acceptance Model (TAM)</span>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main>
+        <header>
+            <div class="header-title">
+                <h1 id="page-title">Dashboard Sistem Informasi Manajemen Persediaan</h1>
+                <p id="page-desc">Optimalisasi Adopsi SIMP Berbasis Web Guna Mencegah Keterlambatan Pengadaan</p>
+            </div>
+            <div class="user-profile">
+                <i class="fa-solid fa-user-gear"></i> Staf Operasional / Purchasing
+            </div>
+        </header>
+
+        <div class="content-body">
+            
+            <!-- HALAMAN 1: DASHBOARD STOK -->
+            <div id="section-dashboard" class="page-section">
+                <!-- Cards Ringkasan -->
+                <div class="cards-grid">
+                    <div class="card">
+                        <div class="card-title">Total Jenis Bahan Baku</div>
+                        <div class="card-value" id="total-items">4 Jenis</div>
+                    </div>
+                    <div class="card alert-card">
+                        <div class="card-title">Peringatan Reorder Point</div>
+                        <div class="card-value danger" id="alert-count">2 Item</div>
+                    </div>
+                    <div class="card success-card">
+                        <div class="card-title">Efisiensi Siklus Pengadaan</div>
+                        <div class="card-value success">+25% Cepat</div>
+                    </div>
+                </div>
+
+                <!-- Panel Input Tambah Bahan Baku -->
+                <div class="control-panel">
+                    <div class="panel-box">
+                        <h3><i class="fa-solid fa-circle-plus"></i> Tambah Bahan Baku Baru</h3>
+                        <div class="form-grid">
+                            <input type="text" id="add-code" placeholder="Kode (Cth: BB-005)">
+                            <input type="text" id="add-name" placeholder="Nama Bahan Baku">
+                            <input type="number" id="add-stock" placeholder="Stok Aktual">
+                            <input type="number" id="add-reorder" placeholder="Batas Reorder Point">
+                            <button class="btn btn-primary" onclick="addNewItem()"><i class="fa-solid fa-plus"></i> Simpan Item</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabel Stok Real-Time -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2>Pemantauan Stok Bahan Baku Real-Time</h2>
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="search-input" placeholder="Cari bahan baku..." onkeyup="filterTable()">
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table id="inventory-table">
+                            <thead>
+                                <tr>
+                                    <th>Kode Item</th>
+                                    <th>Nama Bahan Baku</th>
+                                    <th>Stok Aktual</th>
+                                    <th>Batas Aman (Reorder)</th>
+                                    <th>Status Sistem</th>
+                                    <th>Aksi Interaktif</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-table-body">
+                                <!-- Render via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HALAMAN 2: DATA BAHAN BAKU -->
+            <div id="section-materials" class="page-section" style="display: none;">
+                <div class="table-container">
+                    <h2>Direktori Keseluruhan Bahan Baku Produksi Konveksi</h2>
+                    <p style="color: var(--text-light); margin-top: 8px; font-size: 0.9rem;">Kelola seluruh spesifikasi material kain dan aksesoris garmen di sini.</p>
+                    <div style="margin-top: 20px;" id="materials-list-container">
+                        <!-- Konten dinamis bahan baku -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- HALAMAN 3: PENGADAAN & PO -->
+            <div id="section-procurement" class="page-section" style="display: none;">
+                <div class="table-container">
+                    <h2>Manajemen Purchase Order (PO) & Pengadaan</h2>
+                    <p style="color: var(--text-light); margin-top: 8px; font-size: 0.9rem;">Daftar bahan baku yang mencapai titik pemesanan ulang (*reorder point*) dan siap dibuatkan surat pemesanan ke supplier.</p>
+                    <div style="margin-top: 20px;" id="procurement-list-container">
+                        <!-- Konten dinamis PO -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- HALAMAN 4: PENGATURAN SISTEM -->
+            <div id="section-settings" class="page-section" style="display: none;">
+                <div class="table-container">
+                    <h2>Pengaturan Konfigurasi SIMP & Hak Akses</h2>
+                    <p style="color: var(--text-light); margin-top: 8px; font-size: 0.9rem;">Atur ambang batas *reorder point* otomatis dan preferensi akun staf *purchasing*.</p>
+                    <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 16px;">
+                        <label style="font-weight: 600; font-size: 0.9rem;">Batas Toleransi Peringatan Dini Stok (%):</label>
+                        <input type="number" value="15" style="width: 200px; padding: 10px; border: 1px solid var(--border); border-radius: 8px;">
+                        <button class="btn" onclick="showToast('Pengaturan sistem berhasil disimpan!')" style="width: fit-content;">Simpan Perubahan</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Notifikasi Toast Interaktif -->
+    <div id="toast" class="toast">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toast-message">Data berhasil diperbarui!</span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
