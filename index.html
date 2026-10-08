@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIMP Berbasis Web - Manajemen Persediaan</title>
+    <title>Enterprise SIMP - Manajemen Persediaan & HPP Konveksi</title>
     <!-- Google Fonts & FontAwesome Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,24 +11,27 @@
 </head>
 <body>
 
-    <!-- Sidebar -->
+    <!-- Sidebar (Nuansa Biru Doff / Navy Profesional) -->
     <aside>
         <div>
             <div class="sidebar-brand">
-                <i class="fa-solid fa-boxes-stacked"></i> Velox Project
+                <i class="fa-solid fa-industry"></i> VELOX Project
             </div>
             <ul class="sidebar-menu">
                 <li class="menu-link active" onclick="switchPage('dashboard', this)">
-                    <i class="fa-solid fa-chart-pie"></i> Dashboard Stok
+                    <i class="fa-solid fa-chart-pie"></i> Dashboard Utama
                 </li>
-                <li class="menu-link" onclick="switchPage('materials', this)">
-                    <i class="fa-solid fa-warehouse"></i> Data Bahan Baku
+                <li class="menu-link" onclick="switchPage('inventory', this)">
+                    <i class="fa-solid fa-warehouse"></i> Master Stok & Harga
+                </li>
+                <li class="menu-link" onclick="switchPage('mutations', this)">
+                    <i class="fa-solid fa-right-left"></i> Mutasi Masuk / Keluar
                 </li>
                 <li class="menu-link" onclick="switchPage('procurement', this)">
-                    <i class="fa-solid fa-cart-shopping"></i> Pengadaan & PO
+                    <i class="fa-solid fa-file-invoice-dollar"></i> Purchase Order (PO)
                 </li>
-                <li class="menu-link" onclick="switchPage('settings', this)">
-                    <i class="fa-solid fa-gear"></i> Pengaturan Sistem
+                <li class="menu-link" onclick="switchPage('hpp', this)">
+                    <i class="fa-solid fa-calculator"></i> Kalkulator HPP Produk
                 </li>
             </ul>
         </div>
@@ -37,113 +40,244 @@
         </div>
     </aside>
 
-    <!-- Main Content Area -->
+    <!-- Main Workspace -->
     <main>
         <header>
             <div class="header-title">
-                <h1 id="page-title">Dashboard Sistem Informasi Manajemen Persediaan</h1>
-                <p id="page-desc">Optimalisasi Adopsi SIMP Berbasis Web Guna Mencegah Keterlambatan Pengadaan</p>
+                <h1 id="page-title">Dashboard Manajemen Persediaan</h1>
+                <p id="page-desc">Sistem Informasi Pengendalian Bahan Baku Konveksi Berbasis Web</p>
             </div>
             <div class="user-profile">
-                <i class="fa-solid fa-user-gear"></i> Staf Operasional / Purchasing
+                <i class="fa-solid fa-user-shield"></i> Staf Purchasing / Gudang
             </div>
         </header>
 
         <div class="content-body">
             
-            <!-- HALAMAN 1: DASHBOARD STOK -->
+            <!-- 1. HALAMAN DASHBOARD -->
             <div id="section-dashboard" class="page-section">
-                <!-- Cards Ringkasan -->
                 <div class="cards-grid">
-                    <div class="card">
-                        <div class="card-title">Total Jenis Bahan Baku</div>
-                        <div class="card-value" id="total-items">4 Jenis</div>
+                    <div class="card clickable-card" onclick="openDashboardModal('all')">
+                        <div class="card-title">Total Jenis Material (Klik Rincian)</div>
+                        <div class="card-value" id="dash-total-items">0</div>
                     </div>
-                    <div class="card alert-card">
-                        <div class="card-title">Peringatan Reorder Point</div>
-                        <div class="card-value danger" id="alert-count">2 Item</div>
+                    <div class="card alert-card clickable-card" onclick="openDashboardModal('alert')">
+                        <div class="card-title">Peringatan Reorder Point (Klik Rincian)</div>
+                        <div class="card-value danger" id="dash-alert-count">0</div>
                     </div>
                     <div class="card success-card">
-                        <div class="card-title">Efisiensi Siklus Pengadaan</div>
-                        <div class="card-value success">+25% Cepat</div>
+                        <div class="card-title">Efisiensi Siklus Waktu</div>
+                        <div class="card-value success">+25%</div>
+                    </div>
+                    <div class="card info-card clickable-card" onclick="openDashboardModal('asset')">
+                        <div class="card-title">Estimasi Aset Gudang (Klik Rincian)</div>
+                        <div class="card-value" id="dash-total-asset" style="font-size: 1.4rem; color: #0284c7;">Rp 0</div>
                     </div>
                 </div>
 
-                <!-- Panel Input Tambah Bahan Baku -->
-                <div class="control-panel">
-                    <div class="panel-box">
-                        <h3><i class="fa-solid fa-circle-plus"></i> Tambah Bahan Baku Baru</h3>
-                        <div class="form-grid">
-                            <input type="text" id="add-code" placeholder="Kode (Cth: BB-005)">
-                            <input type="text" id="add-name" placeholder="Nama Bahan Baku">
-                            <input type="number" id="add-stock" placeholder="Stok Aktual">
-                            <input type="number" id="add-reorder" placeholder="Batas Reorder Point">
-                            <button class="btn btn-primary" onclick="addNewItem()"><i class="fa-solid fa-plus"></i> Simpan Item</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tabel Stok Real-Time -->
                 <div class="table-container">
                     <div class="table-header">
-                        <h2>Pemantauan Stok Bahan Baku Real-Time</h2>
+                        <h2>Monitoring Material Kain Mendekati Batas Aman</h2>
                         <div class="search-box">
                             <i class="fa-solid fa-magnifying-glass"></i>
-                            <input type="text" id="search-input" placeholder="Cari bahan baku..." onkeyup="filterTable()">
+                            <input type="text" id="dash-search" placeholder="Cari material..." onkeyup="filterDashboardTable()">
                         </div>
                     </div>
-                    
                     <div class="table-responsive">
-                        <table id="inventory-table">
+                        <table>
                             <thead>
                                 <tr>
-                                    <th>Kode Item</th>
-                                    <th>Nama Bahan Baku</th>
+                                    <th>Kode</th>
+                                    <th>Nama Material Kain</th>
+                                    <th>Estimasi Harga/Satuan</th>
                                     <th>Stok Aktual</th>
-                                    <th>Batas Aman (Reorder)</th>
+                                    <th>Reorder Point</th>
                                     <th>Status Sistem</th>
-                                    <th>Aksi Interaktif</th>
                                 </tr>
                             </thead>
-                            <tbody id="inventory-table-body">
-                                <!-- Render via JavaScript -->
-                            </tbody>
+                            <tbody id="dash-table-body"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- HALAMAN 2: DATA BAHAN BAKU -->
-            <div id="section-materials" class="page-section" style="display: none;">
-                <div class="table-container">
-                    <h2>Direktori Keseluruhan Bahan Baku Produksi Konveksi</h2>
-                    <p style="color: var(--text-light); margin-top: 8px; font-size: 0.9rem;">Kelola seluruh spesifikasi material kain dan aksesoris garmen di sini.</p>
-                    <div style="margin-top: 20px;" id="materials-list-container">
-                        <!-- Konten dinamis bahan baku -->
+            <!-- Modal Pop-up Rincian Dashboard -->
+            <div id="dashboard-modal" class="modal-overlay" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="modal-title">Rincian Data</h3>
+                        <button class="btn-close" onclick="closeDashboardModal()"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div class="table-responsive" style="margin-top: 16px; max-height: 400px; overflow-y: auto;">
+                        <table style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Kode</th>
+                                    <th>Nama Material</th>
+                                    <th>Stok</th>
+                                    <th>Harga/Satuan</th>
+                                    <th>Total Nilai / Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modal-table-body"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
-            <!-- HALAMAN 3: PENGADAAN & PO -->
+            <!-- 2. HALAMAN MASTER STOK & HARGA KAIN -->
+            <div id="section-inventory" class="page-section" style="display: none;">
+                <div class="control-panel">
+                    <div class="panel-box">
+                        <h3><i class="fa-solid fa-circle-plus"></i> Tambah Master Data Kain & Harga Pasar</h3>
+                        <div class="form-grid" style="grid-template-columns: 1.2fr 2fr 1.2fr 1fr 1fr auto;">
+                            <input type="text" id="inv-code" placeholder="Kode (Cth: KAIN-05)">
+                            <input type="text" id="inv-name" placeholder="Nama Kain / Material">
+                            <input type="number" id="inv-price" placeholder="Harga (Rp)">
+                            <input type="number" id="inv-stock" placeholder="Stok Awal">
+                            <input type="number" id="inv-reorder" placeholder="Batas ROP">
+                            <button class="btn btn-primary" onclick="addNewInventoryItem()"><i class="fa-solid fa-save"></i> Simpan</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <h2>Direktori Master Stok & Estimasi Harga Pasar</h2>
+                    <div class="table-responsive" style="margin-top: 16px;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kode</th>
+                                    <th>Nama Material</th>
+                                    <th>Harga Pasar (Rp)</th>
+                                    <th>Stok</th>
+                                    <th>Batas ROP</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. HALAMAN MUTASI -->
+            <div id="section-mutations" class="page-section" style="display: none;">
+                <div class="control-panel">
+                    <div class="panel-box">
+                        <h3><i class="fa-solid fa-right-left"></i> Form Input Mutasi Stok Kain</h3>
+                        <div class="form-grid" style="grid-template-columns: 2fr 1fr 1fr 2fr auto;">
+                            <select id="mut-item" style="padding: 9px; border-radius: 8px; border: 1px solid var(--border);"></select>
+                            <select id="mut-type" style="padding: 9px; border-radius: 8px; border: 1px solid var(--border);">
+                                <option value="MASUK">Stok Masuk (Supplier)</option>
+                                <option value="KELUAR">Stok Keluar (Produksi)</option>
+                            </select>
+                            <input type="number" id="mut-qty" placeholder="Jumlah" min="1">
+                            <input type="text" id="mut-note" placeholder="Keterangan / Nota / Line Produksi">
+                            <button class="btn btn-primary" onclick="processMutation()"><i class="fa-solid fa-paper-plane"></i> Proses</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <h2>Log Audit Mutasi Kain Gudang</h2>
+                    <div class="table-responsive" style="margin-top: 16px;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Nama Material</th>
+                                    <th>Tipe Mutasi</th>
+                                    <th>Kuantitas</th>
+                                    <th>Keterangan Audit</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mutation-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. HALAMAN PURCHASE ORDER (PO) -->
             <div id="section-procurement" class="page-section" style="display: none;">
+                <div class="control-panel">
+                    <div class="panel-box">
+                        <h3><i class="fa-solid fa-file-invoice"></i> Buat Surat Purchase Order (PO) & Estimasi Biaya</h3>
+                        <div class="form-grid" style="grid-template-columns: 2fr 1.5fr 1fr auto;">
+                            <select id="po-supplier" style="padding: 9px; border-radius: 8px; border: 1px solid var(--border);">
+                                <option value="PT Textile Nusantara Utama">PT Textile Nusantara Utama</option>
+                                <option value="CV Mitra Kain Abadi">CV Mitra Kain Abadi</option>
+                                <option value="Toko Sentosa Textile">Toko Sentosa Textile</option>
+                            </select>
+                            <select id="po-item" style="padding: 9px; border-radius: 8px; border: 1px solid var(--border);"></select>
+                            <input type="number" id="po-qty" placeholder="Jumlah Pesanan" min="1">
+                            <button class="btn btn-primary" onclick="createPO()"><i class="fa-solid fa-plus-circle"></i> Terbitkan PO</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="table-container">
-                    <h2>Manajemen Purchase Order (PO) & Pengadaan</h2>
-                    <p style="color: var(--text-light); margin-top: 8px; font-size: 0.9rem;">Daftar bahan baku yang mencapai titik pemesanan ulang (*reorder point*) dan siap dibuatkan surat pemesanan ke supplier.</p>
-                    <div style="margin-top: 20px;" id="procurement-list-container">
-                        <!-- Konten dinamis PO -->
+                    <h2>Daftar Purchase Order (PO) & Total Estimasi Biaya</h2>
+                    <div class="table-responsive" style="margin-top: 16px;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID PO</th>
+                                    <th>Supplier</th>
+                                    <th>Material</th>
+                                    <th>Qty</th>
+                                    <th>Total Estimasi Biaya</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="po-table-body"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
-            <!-- HALAMAN 4: PENGATURAN SISTEM -->
-            <div id="section-settings" class="page-section" style="display: none;">
-                <div class="table-container">
-                    <h2>Pengaturan Konfigurasi SIMP & Hak Akses</h2>
-                    <p style="color: var(--text-light); margin-top: 8px; font-size: 0.9rem;">Atur ambang batas *reorder point* otomatis dan preferensi akun staf *purchasing*.</p>
-                    <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 16px;">
-                        <label style="font-weight: 600; font-size: 0.9rem;">Batas Toleransi Peringatan Dini Stok (%):</label>
-                        <input type="number" value="15" style="width: 200px; padding: 10px; border: 1px solid var(--border); border-radius: 8px;">
-                        <button class="btn" onclick="showToast('Pengaturan sistem berhasil disimpan!')" style="width: fit-content;">Simpan Perubahan</button>
+            <!-- 5. HALAMAN KALKULATOR HPP PRODUK -->
+            <div id="section-hpp" class="page-section" style="display: none;">
+                <div class="control-panel">
+                    <div class="panel-box">
+                        <h3><i class="fa-solid fa-calculator"></i> Kalkulator HPP Produk Konveksi</h3>
+                        <p style="color: var(--text-light); font-size: 0.85rem; margin-bottom: 16px;">Hitung Harga Pokok Produksi per Pcs berdasarkan kebutuhan material kain, jasa jahit, bordir/sablon, zipper, dan operasional.</p>
+                        
+                        <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div>
+                                <label style="font-size:0.8rem; font-weight:600; color:var(--text-light);">Pilih Jenis Kain:</label>
+                                <select id="hpp-item" onchange="calculateHPP()" style="width:100%; padding:9px; border-radius:8px; border:1px solid var(--border); margin-top:4px;"></select>
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; font-weight:600; color:var(--text-light);">Jumlah Kebutuhan Kain per Pcs (Kg/Meter):</label>
+                                <input type="number" id="hpp-usage" value="1.5" step="0.1" oninput="calculateHPP()" style="width:100%; margin-top:4px;">
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; font-weight:600; color:var(--text-light);">Harga Jasa Jahit (Rp):</label>
+                                <input type="number" id="hpp-jasa" value="15000" step="500" oninput="calculateHPP()" style="width:100%; margin-top:4px;">
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; font-weight:600; color:var(--text-light);">Harga Bordir / Sablon (Rp):</label>
+                                <input type="number" id="hpp-bordir" value="7000" step="500" oninput="calculateHPP()" style="width:100%; margin-top:4px;">
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; font-weight:600; color:var(--text-light);">Harga Zipper / Resleting (Rp):</label>
+                                <input type="number" id="hpp-zipper" value="5000" step="500" oninput="calculateHPP()" style="width:100%; margin-top:4px;">
+                            </div>
+                            <div>
+                                <label style="font-size:0.8rem; font-weight:600; color:var(--text-light);">Biaya Operasional (Rp):</label>
+                                <input type="number" id="hpp-operasional" value="3000" step="500" oninput="calculateHPP()" style="width:100%; margin-top:4px;">
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 24px; padding: 20px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h4 style="color: #166534; font-size: 1.1rem; font-weight: 700;">Total HPP Produk per Pcs:</h4>
+                                <p style="color: #15803d; font-size: 0.85rem; margin-top: 4px;" id="hpp-breakdown">Rincian biaya komponen produksi.</p>
+                            </div>
+                            <div style="font-size: 1.75rem; font-weight: 700; color: #16a34a;" id="hpp-result">Rp 0</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -151,10 +285,10 @@
         </div>
     </main>
 
-    <!-- Notifikasi Toast Interaktif -->
+    <!-- Toast Notification -->
     <div id="toast" class="toast">
         <i class="fa-solid fa-circle-check"></i>
-        <span id="toast-message">Data berhasil diperbarui!</span>
+        <span id="toast-message">Notifikasi Sistem</span>
     </div>
 
     <script src="script.js"></script>
