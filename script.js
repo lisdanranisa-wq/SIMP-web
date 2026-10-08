@@ -298,7 +298,7 @@ function updateHPPUsage() {
 function calculateHPP() {
     let code = document.getElementById("hpp-item").value;
     let item = inventoryData.find(i => i.code === code);
-    if (!item) return;
+    if (!item) return;  
 
     let usage = parseFloat(document.getElementById("hpp-usage").value) || 0;
     let jasa = parseFloat(document.getElementById("hpp-jasa").value) || 0;
